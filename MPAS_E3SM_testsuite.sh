@@ -161,7 +161,10 @@ if [ "$ALL" == 1 ]; then
     export HIGHRES=0    # HIGHRES runs use too many nodes for Compy
   fi
   if [ "$ANVIL" == 1 ]; then
-    export INTEL=0
+    export INTEL=1
+  fi
+  if [ "$CHRYSALIS" == 1 ]; then
+    export INTEL=1
   fi
 
   export OPT=1
