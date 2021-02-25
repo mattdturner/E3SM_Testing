@@ -18,11 +18,11 @@ export NOBFB=0
 
 # Optimizations
 export DEBUG=0
-export NODEBUG=1    # Default to not running debug
+export NODEBUG=0
 export PEM=0
-export NOPEM=1      # Default to not running partition tests
+export NOPEM=0
 export OPT=0
-export NOOPT=1      # Default to not running optimized tests
+export NOOPT=0
 
 # If ALL is enabled, defaults every option to ON
 export ALL=0
@@ -116,6 +116,10 @@ if [ $# -ne 0 ]; then
     if [ "$argument" == "append" ] || [ "$argument" == "APPEND" ]; then
       export APPEND=1
     fi
+    if [ "$argument" == "nobfb" ] || [ "$argument" == "NOBFB" ]; then
+      export NOBFB=1
+      export BFB=0
+    fi
     if [ "$argument" == "nodebug" ] || [ "$argument" == "NODEBUG" ]; then
       export NODEBUG=1
       export DEBUG=0
@@ -168,15 +172,23 @@ if [ "$ALL" == 1 ]; then
     export INTEL=1
   fi
 
+  if [ "$NODEBUG" == 1 ]; then
+    export DEBUG=0
+    export NODEBUG=1
+  else
+    export DEBUG=1
+    export NODEBUG=0
+  fi
   export OPT=1
   export PEM=1
-  export BFB=1
-  export DEBUG=1
-  export NODEBUG=0
-fi
 
-if [ "$NODEBUG" == 1 ]; then
-  export DEBUG=0
+  if [ "$NOBFB" == 1 ]; then
+    export BFB=0
+    export NOBFB=1
+  else
+    export BFB=1
+    export NOBFB=0
+  fi
 fi
 
 # Check for validity of configuration
@@ -564,7 +576,7 @@ if [ "$CORI" == "1" ]; then
     fi
   fi
 fi
-if [ "$COMPY" == "1" ]; then
+#if [ "$COMPY" == "1" ]; then
   if [ -n "$runcases" ]; then
     echo "RUNNING CASES"
     if [ "$DRYRUN" == "1" ]; then
@@ -594,4 +606,4 @@ if [ "$COMPY" == "1" ]; then
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $outfile)  
     fi
   fi
-fi
+#fi
