@@ -79,6 +79,7 @@ if [ $# -ne 0 ]; then
   do 
     if [ "$argument" == "debug" ] || [ "$argument" == "DEBUG" ]; then
       export DEBUG=1
+      export NODEBUG=0
     fi
     if [ "$argument" == "pgi" ] || [ "$argument" == "PGI" ]; then
       export PGI=1
@@ -171,6 +172,7 @@ if [ "$ALL" == 1 ]; then
   export PEM=1
   export BFB=1
   export DEBUG=1
+  export NODEBUG=0
 fi
 
 if [ "$NODEBUG" == 1 ]; then
