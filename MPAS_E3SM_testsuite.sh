@@ -51,25 +51,25 @@ export MDT_BASEDIR=""
 # Specify the queue to use  (needs to be updated to actually work)
 if [[ $HOSTNAME == *"cori"* ]]; then
   export MDT_CORI=1
-  export MDT_SHORT_QUEUE=${SHORT_QUEUE:-debug}
-  export MDT_LONG_QUEUE=${LONG_QUEUE:-regular}
-  export MDT_SHORTY=" -q $SHORT_QUEUE "
-  export MDT_LONGY=" -q $LONG_QUEUE "
+  export MDT_SHORT_QUEUE=${MDT_SHORT_QUEUE:-debug}
+  export MDT_LONG_QUEUE=${MDT_LONG_QUEUE:-regular}
+  export MDT_SHORTY=" -q $MDT_SHORT_QUEUE "
+  export MDT_LONGY=" -q $MDT_LONG_QUEUE "
   export MDT_PROJECT=""
   export MDT_BASEDIR="/global/cfs/cdirs/e3sm/baselines"
 elif [[ "$HOSTNAME" == *"compy"* ]]; then
   export MDT_COMPY=1
-  export MDT_SHORT_QUEUE=${SHORT_QUEUE:-slurm}
-  export MDT_LONG_QUEUE=${LONG_QUEUE:-slurm}
-  export MDT_SHORTY=" -q $SHORT_QUEUE "
-  export MDT_LONGY=" -q $LONG_QUEUE "
+  export MDT_SHORT_QUEUE=${MDT_SHORT_QUEUE:-slurm}
+  export MDT_LONG_QUEUE=${MDT_LONG_QUEUE:-slurm}
+  export MDT_SHORTY=" -q $MDT_SHORT_QUEUE "
+  export MDT_LONGY=" -q $MDT_LONG_QUEUE "
   export MDT_PROJECT=" -p e3sm "
   export MDT_BASEDIR="/compyfs/e3sm_baselines/pgi/master"
   export MDT_SERVER='compy'
 elif [[ "$HOSTNAME" == *"chrlogin"* ]]; then
   export MDT_CHRYSALIS=1
-  export MDT_SHORT_QUEUE=${SHORT_QUEUE:-slurm}
-  export MDT_LONG_QUEUE=${LONG_QUEUE:-slurm}
+  export MDT_SHORT_QUEUE=${MDT_SHORT_QUEUE:-slurm}
+  export MDT_LONG_QUEUE=${MDT_LONG_QUEUE:-slurm}
   export MDT_SHORTY=""
   export MDT_LONGY=""
   export MDT_PROJECT=""
@@ -77,8 +77,8 @@ elif [[ "$HOSTNAME" == *"chrlogin"* ]]; then
   export MDT_SERVER='chrysalis'
 elif [[ "$HOSTNAME" == *"blueslogin"* ]]; then
   export MDT_ANVIL=1
-  export MDT_SHORT_QUEUE=${SHORT_QUEUE:-slurm}
-  export MDT_LONG_QUEUE=${LONG_QUEUE:-slurm}
+  export MDT_SHORT_QUEUE=${MDT_SHORT_QUEUE:-slurm}
+  export MDT_LONG_QUEUE=${MDT_LONG_QUEUE:-slurm}
   export MDT_SHORTY=""
   export MDT_LONGY=""
   export MDT_PROJECT=""
@@ -87,10 +87,10 @@ elif [[ "$HOSTNAME" == *"blueslogin"* ]]; then
 elif [[ "$HOSTNAME" == *"login"* ]]; then
   export MDT_SUMMIT=1
   # debug, mdt :: update this
-  export MDT_SHORT_QUEUE=${SHORT_QUEUE:-batch}
-  export MDT_LONG_QUEUE=${LONG_QUEUE:-batch}
-  export MDT_SHORTY=" -q $SHORT_QUEUE "
-  export MDT_LONGY=" -q $LONG_QUEUE "
+  export MDT_SHORT_QUEUE=${MDT_SHORT_QUEUE:-batch}
+  export MDT_LONG_QUEUE=${MDT_LONG_QUEUE:-batch}
+  export MDT_SHORTY=" -q $MDT_SHORT_QUEUE "
+  export MDT_LONGY=" -q $MDT_LONG_QUEUE "
   export MDT_PROJECT=" -p e3sm "
   export MDT_BASEDIR=""
   export MDT_SERVER='summit'
