@@ -44,6 +44,8 @@ export MDT_COMPY=0
 export MDT_ANVIL=0
 export MDT_CHRYSALIS=0
 
+export MDT_BASEDIR=""
+
 # Specify the queue to use  (needs to be updated to actually work)
 if [[ $HOSTNAME == *"cori"* ]]; then
   export MDT_CORI=1
@@ -52,6 +54,7 @@ if [[ $HOSTNAME == *"cori"* ]]; then
   export MDT_SHORTY=" -q $SHORT_QUEUE "
   export MDT_LONGY=" -q $LONG_QUEUE "
   export MDT_PROJECT=""
+  export MDT_BASEDIR="/global/cfs/cdirs/e3sm/baselines"
 elif [[ "$HOSTNAME" == *"compy"* ]]; then
   export MDT_COMPY=1
   export MDT_SHORT_QUEUE=${SHORT_QUEUE:-slurm}
@@ -59,13 +62,23 @@ elif [[ "$HOSTNAME" == *"compy"* ]]; then
   export MDT_SHORTY=" -q $SHORT_QUEUE "
   export MDT_LONGY=" -q $LONG_QUEUE "
   export MDT_PROJECT=" -p e3sm "
-elif [[ "$HOSTNAME" == *"blues"* ]]; then
-  # export ANVIL=1  This needs to be handled at the command line because anvil and chrysalis run from blues
+  export MDT_BASEDIR="/compyfs/e3sm_baselines/pgi/master"
+elif [[ "$HOSTNAME" == *"chrlogin"* ]]; then
+  export MDT_CHRYSALIS=1
   export MDT_SHORT_QUEUE=${SHORT_QUEUE:-slurm}
   export MDT_LONG_QUEUE=${LONG_QUEUE:-slurm}
   export MDT_SHORTY=""
   export MDT_LONGY=""
   export MDT_PROJECT=""
+  export MDT_BASEDIR="/lcrc/group/e3sm/baselines/chrys/intel"
+elif [[ "$HOSTNAME" == *"blueslogin"* ]]; then
+  export MDT_ANVIL=1
+  export MDT_SHORT_QUEUE=${SHORT_QUEUE:-slurm}
+  export MDT_LONG_QUEUE=${LONG_QUEUE:-slurm}
+  export MDT_SHORTY=""
+  export MDT_LONGY=""
+  export MDT_PROJECT=""
+  export MDT_BASEDIR="/lcrc/group/e3sm/baselines/anvil/intel"
 elif [[ "$HOSTNAME" == *"login"* ]]; then
   export MDT_SUMMIT=1
   # debug, mdt :: update this
@@ -74,6 +87,7 @@ elif [[ "$HOSTNAME" == *"login"* ]]; then
   export MDT_SHORTY=" -q $SHORT_QUEUE "
   export MDT_LONGY=" -q $LONG_QUEUE "
   export MDT_PROJECT=" -p e3sm "
+  export MDT_BASEDIR=""
 fi
 
 if [ $# -ne 0 ]; then
@@ -109,12 +123,6 @@ if [ $# -ne 0 ]; then
     fi
     if [ "$argument" == "knl" ] || [ "$argument" == "KNL" ]; then
       export MDT_KNL=1
-    fi
-    if [ "$argument" == "anvil" ] || [ "$argument" == "ANVIL" ]; then
-      export MDT_ANVIL=1
-    fi
-    if [ "$argument" == "chrysalis" ] || [ "$argument" == "CHRYSALIS" ]; then
-      export MDT_CHRYSALIS=1
     fi
     if [ "$argument" == "append" ] || [ "$argument" == "APPEND" ]; then
       export MDT_APPEND=1
@@ -172,12 +180,13 @@ if [ "$MDT_ALL" == 1 ]; then
     export MDT_INTEL=1
     export MDT_HIGHRES=0    # MDT_HIGHRES runs use too many nodes for Compy
   fi
-  if [ "$MDT_ANVIL" == 1 ]; then
+  if [ "$MDT_CHRYSALIS" == 1 ]; then
     export MDT_INTEL=1
     export MDT_GNU=1
   fi
-  if [ "$MDT_CHRYSALIS" == 1 ]; then
+  if [ "$MDT_ANVIL" == 1 ]; then
     export MDT_INTEL=1
+    export MDT_GNU=1
   fi
 
   if [ "$MDT_NODEBUG" == 1 ]; then
@@ -246,15 +255,15 @@ if [ "$MDT_COMPY" == "1" ]; then
 fi
 
 if [ "$MDT_ANVIL" == "1" ]; then
-  if [ "$MDT_INTEL" == "0" ] ; then
-    echo "INTEL disabled.  Nothing to do..."
+  if [ "$MDT_INTEL" == "0" ] && [ "$MDT_GNU" == "0" ] ; then
+    echo "INTEL ang GNU disabled.  Nothing to do..."
     exit -1
   fi
 fi
 
 if [ "$MDT_CHRYSALIS" == "1" ]; then
-  if [ "$MDT_INTEL" == "0" ] ; then
-    echo "INTEL disabled.  Nothing to do..."
+  if [ "$MDT_INTEL" == "0" ] && [ "$MDT_GNU" == "0" ] ; then
+    echo "INTEL and GNU disabled.  Nothing to do..."
     exit -1
   fi
 fi
@@ -330,6 +339,8 @@ fi
 # Bit-for-bit cases
 if [ "$MDT_BFB" == "1" ]; then
   cases_bfb="$cases_bfb SMS.T62_oQU120_ais20.MPAS_LISIO_TEST."
+  cases_bfb="$cases_bfb PET_Ln9_P1024.ne30_oECv3.A_WCYCL1850S."
+  cases_bfb="$cases_bfb PEM_Ln9_P1024.ne30_oECv3.A_WCYCL1850S."
 fi
 
 if [ "$MDT_OPT" == "1" ]; then
@@ -427,15 +438,24 @@ if [ "$MDT_CHRYSALIS" == "1" ]; then
     if [ "$MDT_INTEL" == "1" ]; then
       runcases="$runcases ${cas}chrysalis_intel"
     fi
+    if [ "$MDT_GNU" == "1" ]; then
+      runcases="$runcases ${cas}chrysalis_gnu"
+    fi
   done
   for cas in $cases_bfb; do
     if [ "$MDT_INTEL" == "1" ]; then
       runcases_bfb="$runcases_bfb ${cas}chrysalis_intel"
     fi
+    if [ "$MDT_GNU" == "1" ]; then
+      runcases_bfb="$runcases_bfb ${cas}chrysalis_gnu"
+    fi
   done
   for cas in $cases_long; do
     if [ "$MDT_INTEL" == "1" ]; then
       runcases_long="$runcases_long ${cas}chrysalis_intel"
+    fi
+    if [ "$MDT_GNU" == "1" ]; then
+      runcases_long="$runcases_long ${cas}chrysalis_gnu"
     fi
   done
 fi
@@ -444,15 +464,24 @@ if [ "$MDT_ANVIL" == "1" ]; then
     if [ "$MDT_INTEL" == "1" ]; then
       runcases="$runcases ${cas}anvil_intel"
     fi
+    if [ "$MDT_GNU" == "1" ]; then
+      runcases="$runcases ${cas}anvil_gnu"
+    fi
   done
   for cas in $cases_bfb; do
     if [ "$MDT_INTEL" == "1" ]; then
       runcases_bfb="$runcases_bfb ${cas}anvil_intel"
     fi
+    if [ "$MDT_GNU" == "1" ]; then
+      runcases_bfb="$runcases_bfb ${cas}anvil_gnu"
+    fi
   done
   for cas in $cases_long; do
     if [ "$MDT_INTEL" == "1" ]; then
       runcases_long="$runcases_long ${cas}anvil_intel"
+    fi
+    if [ "$MDT_GNU" == "1" ]; then
+      runcases_long="$runcases_long ${cas}anvil_gnu"
     fi
   done
 fi
@@ -626,10 +655,10 @@ else
     echo "RUNNING MDT_BFB CASES"
     if [ "$MDT_DRYRUN" == "1" ]; then
       echo "./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb \
-          -c -b /compyfs/e3sm_baselines/pgi/master"
+          -c -b $MDT_BASEDIR"
     else
       ./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb -c \
-        -b /compyfs/e3sm_baselines/pgi/master \
+        -b $MDT_BASEDIR \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $MDT_outfile)  
     fi
   fi
