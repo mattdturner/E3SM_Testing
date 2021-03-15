@@ -44,6 +44,8 @@ export MDT_COMPY=0
 export MDT_ANVIL=0
 export MDT_CHRYSALIS=0
 
+export MDT_SERVER=''
+
 export MDT_BASEDIR=""
 
 # Specify the queue to use  (needs to be updated to actually work)
@@ -63,6 +65,7 @@ elif [[ "$HOSTNAME" == *"compy"* ]]; then
   export MDT_LONGY=" -q $LONG_QUEUE "
   export MDT_PROJECT=" -p e3sm "
   export MDT_BASEDIR="/compyfs/e3sm_baselines/pgi/master"
+  export MDT_SERVER='compy'
 elif [[ "$HOSTNAME" == *"chrlogin"* ]]; then
   export MDT_CHRYSALIS=1
   export MDT_SHORT_QUEUE=${SHORT_QUEUE:-slurm}
@@ -70,7 +73,8 @@ elif [[ "$HOSTNAME" == *"chrlogin"* ]]; then
   export MDT_SHORTY=""
   export MDT_LONGY=""
   export MDT_PROJECT=""
-  export MDT_BASEDIR="/lcrc/group/e3sm/baselines/chrys/intel"
+  export MDT_BASEDIR="/lcrc/group/e3sm/baselines/chrys/intel/master"
+  export MDT_SERVER='chrysalis'
 elif [[ "$HOSTNAME" == *"blueslogin"* ]]; then
   export MDT_ANVIL=1
   export MDT_SHORT_QUEUE=${SHORT_QUEUE:-slurm}
@@ -78,7 +82,8 @@ elif [[ "$HOSTNAME" == *"blueslogin"* ]]; then
   export MDT_SHORTY=""
   export MDT_LONGY=""
   export MDT_PROJECT=""
-  export MDT_BASEDIR="/lcrc/group/e3sm/baselines/anvil/intel"
+  export MDT_BASEDIR="/lcrc/group/e3sm/baselines/anvil/intel/master"
+  export MDT_SERVER='anvil'
 elif [[ "$HOSTNAME" == *"login"* ]]; then
   export MDT_SUMMIT=1
   # debug, mdt :: update this
@@ -88,6 +93,7 @@ elif [[ "$HOSTNAME" == *"login"* ]]; then
   export MDT_LONGY=" -q $LONG_QUEUE "
   export MDT_PROJECT=" -p e3sm "
   export MDT_BASEDIR=""
+  export MDT_SERVER='summit'
 fi
 
 if [ $# -ne 0 ]; then
@@ -328,7 +334,9 @@ echo "Outputting case directories to $MDT_outfile"
 
 # Create the strings that contain all of the cases to be run
 cases=''
-cases_bfb=''
+cases_bfb_gnu=''
+cases_bfb_intel=''
+cases_bfb_pgi=''
 cases_long=''
 
 # High resolution cases
@@ -338,9 +346,21 @@ fi
 
 # Bit-for-bit cases
 if [ "$MDT_BFB" == "1" ]; then
-  cases_bfb="$cases_bfb SMS.T62_oQU120_ais20.MPAS_LISIO_TEST."
-  cases_bfb="$cases_bfb PET_Ln9_P1024.ne30_oECv3.A_WCYCL1850S."
-  cases_bfb="$cases_bfb PEM_Ln9_P1024.ne30_oECv3.A_WCYCL1850S."
+  if [ "$MDT_INTEL" == "1" ]; then
+    cases_bfb_intel="$cases_bfb_intel SMS.T62_oQU120_ais20.MPAS_LISIO_TEST."
+    cases_bfb_intel="$cases_bfb_intel PET_Ln9.ne30_oECv3.A_WCYCL1850S."
+    cases_bfb_intel="$cases_bfb_intel PEM_Ln9.ne30_oECv3.A_WCYCL1850S."
+  fi
+  if [ "$MDT_GNU" == "1" ]; then
+    cases_bfb_gnu="$cases_bfb_gnu SMS.T62_oQU120_ais20.MPAS_LISIO_TEST."
+    cases_bfb_gnu="$cases_bfb_gnu PET_Ln9.ne30_oECv3.A_WCYCL1850S."
+    cases_bfb_gnu="$cases_bfb_gnu PEM_Ln9.ne30_oECv3.A_WCYCL1850S."
+  fi
+  if [ "$MDT_PGI" == "1" ]; then
+    cases_bfb_pgi="$cases_bfb_pgi SMS.T62_oQU120_ais20.MPAS_LISIO_TEST."
+    cases_bfb_pgi="$cases_bfb_pgi PET_Ln9.ne30_oECv3.A_WCYCL1850S."
+    cases_bfb_pgi="$cases_bfb_pgi PEM_Ln9.ne30_oECv3.A_WCYCL1850S."
+  fi
 fi
 
 if [ "$MDT_OPT" == "1" ]; then
@@ -369,8 +389,11 @@ fi
 
 # For each case, finish the list by adding the machine and compiler combinations
 runcases=''
-runcases_bfb=''
+runcases_bfb_gnu=''
+runcases_bfb_intel=''
+runcases_bfb_pgi=''
 runcases_long=''
+bfb_fail=''
 if [ "$MDT_CORI" == "1" ]; then
   runcases_haswell=''
   #runcases_haswell_bfb=''
@@ -432,82 +455,69 @@ if [ "$MDT_CORI" == "1" ]; then
       fi
     fi
   done
-fi
-if [ "$MDT_CHRYSALIS" == "1" ]; then
+else
+  # Generate runcases for all servers except Cori
+#if [ "$MDT_CHRYSALIS" == "1" ]; then
+
+  # Short cases
   for cas in $cases; do
     if [ "$MDT_INTEL" == "1" ]; then
-      runcases="$runcases ${cas}chrysalis_intel"
+      runcases="$runcases ${cas}${MDT_SERVER}_intel"
     fi
     if [ "$MDT_GNU" == "1" ]; then
-      runcases="$runcases ${cas}chrysalis_gnu"
-    fi
-  done
-  for cas in $cases_bfb; do
-    if [ "$MDT_INTEL" == "1" ]; then
-      runcases_bfb="$runcases_bfb ${cas}chrysalis_intel"
-    fi
-    if [ "$MDT_GNU" == "1" ]; then
-      runcases_bfb="$runcases_bfb ${cas}chrysalis_gnu"
-    fi
-  done
-  for cas in $cases_long; do
-    if [ "$MDT_INTEL" == "1" ]; then
-      runcases_long="$runcases_long ${cas}chrysalis_intel"
-    fi
-    if [ "$MDT_GNU" == "1" ]; then
-      runcases_long="$runcases_long ${cas}chrysalis_gnu"
-    fi
-  done
-fi
-if [ "$MDT_ANVIL" == "1" ]; then
-  for cas in $cases; do
-    if [ "$MDT_INTEL" == "1" ]; then
-      runcases="$runcases ${cas}anvil_intel"
-    fi
-    if [ "$MDT_GNU" == "1" ]; then
-      runcases="$runcases ${cas}anvil_gnu"
-    fi
-  done
-  for cas in $cases_bfb; do
-    if [ "$MDT_INTEL" == "1" ]; then
-      runcases_bfb="$runcases_bfb ${cas}anvil_intel"
-    fi
-    if [ "$MDT_GNU" == "1" ]; then
-      runcases_bfb="$runcases_bfb ${cas}anvil_gnu"
-    fi
-  done
-  for cas in $cases_long; do
-    if [ "$MDT_INTEL" == "1" ]; then
-      runcases_long="$runcases_long ${cas}anvil_intel"
-    fi
-    if [ "$MDT_GNU" == "1" ]; then
-      runcases_long="$runcases_long ${cas}anvil_gnu"
-    fi
-  done
-fi
-if [ "$MDT_COMPY" == "1" ]; then
-  for cas in $cases; do
-    if [ "$MDT_INTEL" == "1" ]; then
-      runcases="$runcases ${cas}compy_intel"
+      runcases="$runcases ${cas}${MDT_SERVER}_gnu"
     fi
     if [ "$MDT_PGI" == "1" ]; then
-      runcases="$runcases ${cas}compy_pgi"
+      runcases="$runcases ${cas}${MDT_SERVER}_pgi"
     fi
   done
-  for cas in $cases_bfb; do
-    if [ "$MDT_INTEL" == "1" ]; then
-      runcases_bfb="$runcases_bfb ${cas}compy_intel"
-    fi
-    if [ "$MDT_PGI" == "1" ]; then
-      runcases_bfb="$runcases_bfb ${cas}compy_pgi"
-    fi
-  done
+  # GNU BFB cases
+  if [ "$MDT_GNU" == "1" ]; then
+    for cas in $cases_bfb_gnu; do
+      tmp_case="${cas}${MDT_SERVER}_gnu"
+      basedir="${MDT_BASEDIR/intel/gnu}"
+      if [ -d "$basedir/$tmp_case" ]; then
+        runcases_bfb_gnu="$runcases_bfb_gnu ${cas}${MDT_SERVER}_gnu"
+      else
+        bfb_fail="$bfb_fail $tmp_case"
+      fi
+    done
+  fi
+  # Intel BFB cases
+  if [ "$MDT_INTEL" == "1" ]; then
+    for cas in $cases_bfb_intel; do
+      tmp_case="${cas}${MDT_SERVER}_intel"
+      basedir="${MDT_BASEDIR}"
+      if [ -d "$basedir/$tmp_case" ]; then
+        runcases_bfb_intel="$runcases_bfb_intel ${cas}${MDT_SERVER}_intel"
+      else
+        bfb_fail="$bfb_fail $tmp_case"
+      fi
+    done
+  fi
+  # PGI BFB cases
+  if [ "$MDT_PGI" == "1" ]; then
+    for cas in $cases_bfb_pgi; do
+      tmp_case="${cas}${MDT_SERVER}_pgi"
+      basedir="${MDT_BASEDIR/intel/pgi}"
+      if [ -d "$basedir/$tmp_case" ]; then
+        runcases_bfb_pgi="$runcases_bfb_pgi ${cas}${MDT_SERVER}_pgi"
+      else
+        bfb_fail="$bfb_fail $tmp_case"
+      fi
+    done
+  fi
+
+  # Long cases
   for cas in $cases_long; do
     if [ "$MDT_INTEL" == "1" ]; then
-      runcases_long="$runcases_long ${cas}compy_intel"
+      runcases_long="$runcases_long ${cas}${MDT_SERVER}_intel"
+    fi
+    if [ "$MDT_GNU" == "1" ]; then
+      runcases_long="$runcases_long ${cas}${MDT_SERVER}_gnu"
     fi
     if [ "$MDT_PGI" == "1" ]; then
-      runcases_long="$runcases_long ${cas}compy_pgi"
+      runcases_long="$runcases_long ${cas}${MDT_SERVER}_pgi"
     fi
   done
 fi
@@ -538,44 +548,32 @@ if [ "$MDT_VERBOSE" == "1" ]; then
     for cas in $runcases_knl_long; do
       echo " - $cas"
     done
-  fi
-  if [ "$MDT_ANVIL" == "1" ]; then
+  else
+    # Non-Cori servers
     echo "runcases = "
     for cas in $runcases; do
       echo " - $cas"
     done
-    echo "runcases_bfb = "
-    for cas in $runcases_bfb; do
-      echo " - $cas"
-    done
-    echo "runcases_long = "
-    for cas in $runcases_long; do
-      echo " - $cas"
-    done
-  fi
-  if [ "$MDT_CHRYSALIS" == "1" ]; then
-    echo "runcases = "
-    for cas in $runcases; do
-      echo " - $cas"
-    done
-    echo "runcases_bfb = "
-    for cas in $runcases_bfb; do
-      echo " - $cas"
-    done
-    echo "runcases_long = "
-    for cas in $runcases_long; do
-      echo " - $cas"
-    done
-  fi
-  if [ "$MDT_COMPY" == "1" ]; then
-    echo "runcases = "
-    for cas in $runcases; do
-      echo " - $cas"
-    done
-    echo "runcases_bfb = "
-    for cas in $runcases_bfb; do
-      echo " - $cas"
-    done
+    if [ "$MDT_BFB" == "1" ]; then
+      if [ "$MDT_INTEL" == "1" ]; then
+        echo "runcases_bfb_intel = "
+        for cas in $runcases_bfb_intel; do
+          echo " - $cas"
+        done
+      fi
+      if [ "$MDT_GNU" == "1" ]; then
+        echo "runcases_bfb_gnu = "
+        for cas in $runcases_bfb_gnu; do
+          echo " - $cas"
+        done
+      fi
+      if [ "$MDT_PGI" == "1" ]; then
+        echo "runcases_bfb_pgi = "
+        for cas in $runcases_bfb_pgi; do
+          echo " - $cas"
+        done
+      fi
+    fi
     echo "runcases_long = "
     for cas in $runcases_long; do
       echo " - $cas"
@@ -651,14 +649,39 @@ else
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $MDT_outfile)  
     fi
   fi
-  if [ -n "$runcases_bfb" ]; then
+  if [ -n "$runcases_bfb_intel" ]; then
+    basedir="${MDT_BASEDIR}"
     echo "RUNNING MDT_BFB CASES"
     if [ "$MDT_DRYRUN" == "1" ]; then
-      echo "./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb \
-          -c -b $MDT_BASEDIR"
+      echo "./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb_intel \
+          -c -b $basedir"
     else
-      ./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb -c \
-        -b $MDT_BASEDIR \
+      ./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb_intel -c \
+        -b $basedir \
+        | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $MDT_outfile)  
+    fi
+  fi
+  if [ -n "$runcases_bfb_pgi" ]; then
+    basedir="${MDT_BASEDIR/intel/pgi}"
+    echo "RUNNING MDT_BFB CASES"
+    if [ "$MDT_DRYRUN" == "1" ]; then
+      echo "./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb_pgi \
+          -c -b $basedir"
+    else
+      ./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb_pgi -c \
+        -b $basedir \
+        | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $MDT_outfile)  
+    fi
+  fi
+  if [ -n "$runcases_bfb_gnu" ]; then
+    basedir="${MDT_BASEDIR/intel/gnu}"
+    echo "RUNNING MDT_BFB CASES"
+    if [ "$MDT_DRYRUN" == "1" ]; then
+      echo "./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb_gnu \
+          -c -b $basedir"
+    else
+      ./create_test $MDT_PROJECT $MDT_LONGY --walltime 02:30:00  $runcases_bfb_gnu -c \
+        -b $basedir \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $MDT_outfile)  
     fi
   fi
@@ -671,4 +694,17 @@ else
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $MDT_outfile)  
     fi
   fi
+fi
+
+if [ ! "$bfb_fail" == "" ]; then
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo ""
+  echo "Unable to find a baseline for:"
+  for cas in $bfb_fail
+  do 
+    echo "  - $cas"
+  done
 fi
