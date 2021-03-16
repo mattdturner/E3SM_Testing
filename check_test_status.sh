@@ -20,9 +20,12 @@ if [ "$summary" == "1" ] ; then
   cat $case_lists | { while read dir; do
     export PASS=`grep -v PASS $dir/TestStatus | wc -l`
     if [ "$PASS" == "0" ] ; then
-      casename=`echo "$dir" | rev | cut -d'/' -f 1 | cut -d '.' -f 2- | rev`
-      if [[ $PASS_CASES != *"$casename"* ]]; then
-        PASS_CASES="${PASS_CASES}${casename}${NEWLINE}"
+      PASS_CNT=`grep PASS $dir/TestStatus | wc -l`
+      if [ "$PASS_CNT" != 0 ]; then
+        casename=`echo "$dir" | rev | cut -d'/' -f 1 | cut -d '.' -f 2- | rev`
+        if [[ $PASS_CASES != *"$casename"* ]]; then
+          PASS_CASES="${PASS_CASES}${casename}${NEWLINE}"
+        fi
       fi
     else
       #echo "$dir" | rev | cut -d'/' -f 1 | rev
