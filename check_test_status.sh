@@ -18,6 +18,9 @@ if [ "$summary" == "1" ] ; then
   FAIL_CASES=""
   NEWLINE=$'\n'
   cat $case_lists | { while read dir; do
+    if [ ! -f $dir/TestStatus ]; then
+      continue
+    fi
     export PASS=`grep -v PASS $dir/TestStatus | wc -l`
     if [ "$PASS" == "0" ] ; then
       PASS_CNT=`grep PASS $dir/TestStatus | wc -l`
