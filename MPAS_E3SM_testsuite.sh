@@ -350,16 +350,19 @@ if [ "$MDT_BFB" == "1" ]; then
     cases_bfb_intel="$cases_bfb_intel SMS.T62_oQU120_ais20.MPAS_LISIO_TEST."
     cases_bfb_intel="$cases_bfb_intel PET_Ln9.ne30_oECv3.A_WCYCL1850S."
     cases_bfb_intel="$cases_bfb_intel PEM_Ln9.ne30_oECv3.A_WCYCL1850S."
+    cases_bfb_intel="$cases_bfb_intel PEM_Ln9.ne30_oECv3_ICG.A_WCYCL1850S."
   fi
   if [ "$MDT_GNU" == "1" ]; then
     cases_bfb_gnu="$cases_bfb_gnu SMS.T62_oQU120_ais20.MPAS_LISIO_TEST."
     cases_bfb_gnu="$cases_bfb_gnu PET_Ln9.ne30_oECv3.A_WCYCL1850S."
     cases_bfb_gnu="$cases_bfb_gnu PEM_Ln9.ne30_oECv3.A_WCYCL1850S."
+    cases_bfb_gnu="$cases_bfb_gnu PEM_Ln9.ne30_oECv3_ICG.A_WCYCL1850S."
   fi
   if [ "$MDT_PGI" == "1" ]; then
     cases_bfb_pgi="$cases_bfb_pgi SMS.T62_oQU120_ais20.MPAS_LISIO_TEST."
     cases_bfb_pgi="$cases_bfb_pgi PET_Ln9.ne30_oECv3.A_WCYCL1850S."
     cases_bfb_pgi="$cases_bfb_pgi PEM_Ln9.ne30_oECv3.A_WCYCL1850S."
+    cases_bfb_pgi="$cases_bfb_pgi PEM_Ln9.ne30_oECv3_ICG.A_WCYCL1850S."
   fi
 fi
 
