@@ -6,7 +6,8 @@ This repo houses a script (MPAS_E3SM_testsuite.sh) that I use to perform testing
   - It will auto-detect the server that it is being run on, and populate the necessary info for running jobs (queue names, accounts, baseline directories, etc.)
   - For bit-for-bit tests (comparing to baseline), it will check to ensure baseline directory exists prior to running the test.
   
-  - For example, to run optimized and bit-for-bit tests w/ the Intel compiler:
+  Examples:
+  - To run optimized and bit-for-bit tests w/ the Intel compiler:
     `./MPAS_E3SM_testsuite.sh opt bfb intel`
   - Or to run all tests for a given server:
     `./MPAS_E3SM_testsuite.sh all`
