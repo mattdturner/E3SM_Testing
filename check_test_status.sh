@@ -23,11 +23,12 @@ if [ "$summary" == "1" ] ; then
     fi
     export PASS=`grep -v PASS $dir/TestStatus | wc -l`
     if [ "$PASS" == "0" ] ; then
-      PASS_CNT=`grep PASS $dir/TestStatus | wc -l`
-      if [ "$PASS_CNT" != 0 ]; then
-        casename=`echo "$dir" | rev | cut -d'/' -f 1 | cut -d '.' -f 2- | rev`
-        if [[ $PASS_CASES != *"$casename"* ]]; then
-          PASS_CASES="${PASS_CASES}${casename}${NEWLINE}"
+      casename=`echo "$dir" | rev | cut -d'/' -f 1 | cut -d '.' -f 2- | rev`
+      if [[ $PASS_CASES != *"$casename"* ]]; then
+        PASS_CASES="${PASS_CASES}${casename}${NEWLINE}"
+        baseline=`grep BASELINE $dir/TestStatus`
+        if [ ! -z "$baseline" ]; then
+          PASS_CASES="${PASS_CASES}  - ${baseline}${NEWLINE}"
         fi
       fi
     else
@@ -35,6 +36,10 @@ if [ "$summary" == "1" ] ; then
       casename=`cat $dir/TestStatus | grep -v PASS | awk '{ gsub("PEND", "\033[1;33m&\033[0m"); gsub("FAIL", "\033[1;31m&\033[0m"); print}' | sed 's/time=.*//'`
       if [[ $FAIL_CASES != *"$casename"* ]]; then
         FAIL_CASES="$FAIL_CASES$casename${NEWLINE}"
+        baseline=`grep BASELINE $dir/TestStatus`
+        if [ ! -z "$baseline" ]; then
+          FAIL_CASES="${FAIL_CASES}  - ${baseline}${NEWLINE}"
+        fi
       fi
     fi
   done
@@ -52,7 +57,7 @@ else
     #cat $dir/TestStatus
     #grep -v 'PASS'  $dir/TestStatus
     cat $dir/TestStatus | grep -v PASS | awk '{ gsub("PEND", "\033[1;33m&\033[0m"); gsub("FAIL", "\033[1;31m&\033[0m"); print}'
-    cat $dir/TestStatus | grep BASELINE | awk '{ gsub("PEND", "\033[1;33m&\033[0m"); gsub("FAIL", "\033[1;31m&\033[0m"); gsub("PASS", "\033[1;32m&\033[0m"); print}'                                                
+    cat $dir/TestStatus | grep BASELINE | awk '{ gsub("PEND", "\033[1;33m&\033[0m"); gsub("FAIL", "\033[1;31m&\033[0m"); gsub("PASS", "\033[1;32m&\033[0m"); print}'
     echo '------------'
   done
 fi
