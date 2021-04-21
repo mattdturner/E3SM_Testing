@@ -2,16 +2,31 @@
 
 case_lists=~/E3SM/cime/scripts/casedirs.txt
 
+help=0
+
 while :; do
   case $1 in
     summary) summary=1
     ;;
     -i|--inputfile) case_lists=$2 && shift
     ;;
+    help|-h|--help) help=1
+    ;;
     *) break
   esac
   shift
 done
+
+if [ "$help" == "1" ]; then
+  echo "Usage: ./check_test_status.sh"
+  echo ""
+  echo "By default, the script gets a list of directories from ~/E3SM/cime/scripts/casedirs.txt"
+  echo "Options:"
+  echo "   -h, --help, help: Prints this help message"
+  echo "   summary:          Prints a summary report"
+  echo "   -i, --inputfile:  Allows you to specify the file that contains the list of directories."
+  exit
+fi
 
 if [ "$summary" == "1" ] ; then
   PASS_CASES=""
