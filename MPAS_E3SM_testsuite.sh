@@ -228,6 +228,15 @@ if [ "$SLF_HELP" == "1" ]; then
   echo "  Cori-specific options:"
   echo "    haswell, HASWELL    : Run tests on Haswell nodes"
   echo "    knl, KNL            : Run tests on KNL nodes"
+  echo ""
+  echo "---"
+  echo "Examples:"
+  echo "   Run all tests:"
+  echo "    ./MPAS_E3SM_testsuite.sh all"
+  echo "   Run all tests, except bit-for-bit:"
+  echo "    ./MPAS_E3SM_testsuite.sh all nobfb"
+  echo "   Run Intel bit-for-bit tests only:"
+  echo "    ./MPAS_E3SM_testsuite.sh intel bfb"
   exit
 fi
 
