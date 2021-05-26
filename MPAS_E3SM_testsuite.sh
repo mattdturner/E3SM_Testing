@@ -60,16 +60,16 @@ if [[ $HOSTNAME == *"cori"* ]]; then
   export SLF_CORI=1
   export SLF_SHORT_QUEUE=${SLF_SHORT_QUEUE:-debug}
   export SLF_LONG_QUEUE=${SLF_LONG_QUEUE:-regular}
-  export SLF_SHORTY=" -q $SLF_SHORT_QUEUE "
-  export SLF_LONGY=" -q $SLF_LONG_QUEUE "
+  export SLF_SHORTQ=" -q $SLF_SHORT_QUEUE "
+  export SLF_LONGQ=" -q $SLF_LONG_QUEUE "
   export SLF_PROJECT=""
   export SLF_BASEDIR="/global/cfs/cdirs/e3sm/baselines"
 elif [[ "$HOSTNAME" == *"compy"* ]]; then
   export SLF_COMPY=1
   export SLF_SHORT_QUEUE=${SLF_SHORT_QUEUE:-slurm}
   export SLF_LONG_QUEUE=${SLF_LONG_QUEUE:-slurm}
-  export SLF_SHORTY=" -q $SLF_SHORT_QUEUE "
-  export SLF_LONGY=" -q $SLF_LONG_QUEUE "
+  export SLF_SHORTQ=" -q $SLF_SHORT_QUEUE "
+  export SLF_LONGQ=" -q $SLF_LONG_QUEUE "
   export SLF_PROJECT=" -p e3sm "
   export SLF_BASEDIR="/compyfs/e3sm_baselines/pgi/master"
   export SLF_SERVER='compy'
@@ -77,8 +77,8 @@ elif [[ "$HOSTNAME" == *"chrlogin"* ]]; then
   export SLF_CHRYSALIS=1
   export SLF_SHORT_QUEUE=${SLF_SHORT_QUEUE:-slurm}
   export SLF_LONG_QUEUE=${SLF_LONG_QUEUE:-slurm}
-  export SLF_SHORTY=""
-  export SLF_LONGY=""
+  export SLF_SHORTQ=""
+  export SLF_LONGQ=""
   export SLF_PROJECT=""
   export SLF_BASEDIR="/lcrc/group/e3sm/baselines/chrys/intel/master"
   export SLF_SERVER='chrysalis'
@@ -86,8 +86,8 @@ elif [[ "$HOSTNAME" == *"blueslogin"* ]]; then
   export SLF_ANVIL=1
   export SLF_SHORT_QUEUE=${SLF_SHORT_QUEUE:-slurm}
   export SLF_LONG_QUEUE=${SLF_LONG_QUEUE:-slurm}
-  export SLF_SHORTY=""
-  export SLF_LONGY=""
+  export SLF_SHORTQ="-q e3sm-debug"
+  export SLF_LONGQ=""
   export SLF_PROJECT=""
   export SLF_BASEDIR="/lcrc/group/e3sm/baselines/anvil/intel/master"
   export SLF_SERVER='anvil'
@@ -96,8 +96,8 @@ elif [[ "$HOSTNAME" == *"login"* ]]; then
   # debug, mdt :: update this
   export SLF_SHORT_QUEUE=${SLF_SHORT_QUEUE:-batch}
   export SLF_LONG_QUEUE=${SLF_LONG_QUEUE:-batch}
-  export SLF_SHORTY=" -q $SLF_SHORT_QUEUE "
-  export SLF_LONGY=" -q $SLF_LONG_QUEUE "
+  export SLF_SHORTQ=" -q $SLF_SHORT_QUEUE "
+  export SLF_LONGQ=" -q $SLF_LONG_QUEUE "
   export SLF_PROJECT=" -p e3sm "
   export SLF_BASEDIR=""
   export SLF_SERVER='summit'
@@ -653,18 +653,18 @@ if [ "$SLF_CORI" == "1" ]; then
   if [ -n "$runcases_haswell" ]; then
     echo "RUNNING SLF_HASWELL CASES"
     if [ "$SLF_DRYRUN" == "1" ]; then
-      echo "./create_test ${SLF_PROJECT} -j 8 ${SLF_SHORTY} --walltime 00:30:00  $runcases_haswell "
+      echo "./create_test ${SLF_PROJECT} -j 8 ${SLF_SHORTQ} --walltime 00:30:00  $runcases_haswell "
     else
-      ./create_test ${SLF_PROJECT} -j 8 ${SLF_SHORTY} --walltime 00:30:00  $runcases_haswell \
+      ./create_test ${SLF_PROJECT} -j 8 ${SLF_SHORTQ} --walltime 00:30:00  $runcases_haswell \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $SLF_outfile)  
     fi
   fi
   if [ -n "$runcases_knl" ]; then
     echo "RUNNING SLF_KNL CASES"
     if [ "$SLF_DRYRUN" == "1" ]; then
-      echo "./create_test ${SLF_PROJECT} -j 8 ${SLF_SHORTY} --walltime 00:30:00  $runcases_knl"
+      echo "./create_test ${SLF_PROJECT} -j 8 ${SLF_SHORTQ} --walltime 00:30:00  $runcases_knl"
     else
-      ./create_test ${SLF_PROJECT} -j 8 ${SLF_SHORTY} --walltime 00:30:00  $runcases_knl \
+      ./create_test ${SLF_PROJECT} -j 8 ${SLF_SHORTQ} --walltime 00:30:00  $runcases_knl \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $SLF_outfile)  
     fi
   fi
@@ -690,18 +690,18 @@ if [ "$SLF_CORI" == "1" ]; then
   if [ -n "$runcases_haswell_long" ]; then
     echo "RUNNING SLF_HASWELL LONG CASES"
     if [ "$SLF_DRYRUN" == "1" ]; then
-      echo "./create_test ${SLF_PROJECT} ${SLF_LONGY}--walltime 02:30:00  $runcases_haswell_long"
+      echo "./create_test ${SLF_PROJECT} ${SLF_LONGQ}--walltime 02:30:00  $runcases_haswell_long"
     else
-      ./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_haswell_long \
+      ./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_haswell_long \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $SLF_outfile)  
     fi
   fi
   if [ -n "$runcases_knl_long" ]; then
     echo "RUNNING SLF_KNL LONG CASES"
     if [ "$SLF_DRYRUN" == "1" ]; then
-      echo "./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_knl_long"
+      echo "./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_knl_long"
     else
-      ./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_knl_long \
+      ./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_knl_long \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $SLF_outfile)  
     fi
   fi
@@ -710,9 +710,9 @@ else
   if [ -n "$runcases" ]; then
     echo "RUNNING CASES"
     if [ "$SLF_DRYRUN" == "1" ]; then
-      echo "./create_test $SLF_PROJECT -j 8 $SLF_SHORTY --walltime 00:30:00  $runcases"
+      echo "./create_test $SLF_PROJECT -j 8 $SLF_SHORTQ --walltime 00:30:00  $runcases"
     else
-      ./create_test $SLF_PROJECT -j 8 $SLF_SHORTY --walltime 00:30:00  $runcases \
+      ./create_test $SLF_PROJECT -j 8 $SLF_SHORTQ --walltime 00:30:00  $runcases \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $SLF_outfile)  
     fi
   fi
@@ -720,10 +720,10 @@ else
     basedir="${SLF_BASEDIR}"
     echo "RUNNING SLF_BFB CASES"
     if [ "$SLF_DRYRUN" == "1" ]; then
-      echo "./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_bfb_intel \
+      echo "./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_bfb_intel \
           -c -b $basedir"
     else
-      ./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_bfb_intel -c \
+      ./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_bfb_intel -c \
         -b $basedir \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $SLF_outfile)  
     fi
@@ -732,10 +732,10 @@ else
     basedir="${SLF_BASEDIR/intel/pgi}"
     echo "RUNNING SLF_BFB CASES"
     if [ "$SLF_DRYRUN" == "1" ]; then
-      echo "./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_bfb_pgi \
+      echo "./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_bfb_pgi \
           -c -b $basedir"
     else
-      ./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_bfb_pgi -c \
+      ./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_bfb_pgi -c \
         -b $basedir \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $SLF_outfile)  
     fi
@@ -744,10 +744,10 @@ else
     basedir="${SLF_BASEDIR/intel/gnu}"
     echo "RUNNING SLF_BFB CASES"
     if [ "$SLF_DRYRUN" == "1" ]; then
-      echo "./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_bfb_gnu \
+      echo "./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_bfb_gnu \
           -c -b $basedir"
     else
-      ./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_bfb_gnu -c \
+      ./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_bfb_gnu -c \
         -b $basedir \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $SLF_outfile)  
     fi
@@ -755,9 +755,9 @@ else
   if [ -n "$runcases_long" ]; then
     echo "RUNNING LONG CASES"
     if [ "$SLF_DRYRUN" == "1" ]; then
-      echo "./create_test $PROJECT $LONGY --walltime 02:30:00  $runcases_long"
+      echo "./create_test $PROJECT $LONGQ --walltime 02:30:00  $runcases_long"
     else
-      ./create_test $SLF_PROJECT $SLF_LONGY --walltime 02:30:00  $runcases_long \
+      ./create_test $SLF_PROJECT $SLF_LONGQ --walltime 02:30:00  $runcases_long \
         | tee >(stdbuf -oL sed -n 's/.*Creating test directory\s*\([^\s]*\)/\1/p' >> $SLF_outfile)  
     fi
   fi
